@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>小搭</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="stage">
+    <!-- 系统信息面板：环绕小人，仅「聊天」可点击 -->
+    <div id="panels" class="hidden">
+      <div class="panel hit" id="p-claude">
+        <div class="p-title"><span class="p-ico ico-claude">✳</span>Claude</div>
+        <div class="p-body">…</div>
+      </div>
+      <div class="panel hit" id="p-cpu">
+        <div class="p-title"><span class="p-ico ico-cpu">▣</span>处理器</div>
+        <div class="p-body">…</div>
+      </div>
+      <div class="panel hit" id="p-mem">
+        <div class="p-title"><span class="p-ico ico-mem">▤</span>内存</div>
+        <div class="p-body">…</div>
+      </div>
+      <div class="panel hit" id="p-disk">
+        <div class="p-title"><span class="p-ico ico-disk">◫</span>存储</div>
+        <div class="p-body">…</div>
+      </div>
+      <div class="panel hit" id="p-batt">
+        <div class="p-title"><span class="p-ico ico-batt">▮</span>电池</div>
+        <div class="p-body">…</div>
+      </div>
+      <div class="panel hit" id="p-net">
+        <div class="p-title"><span class="p-ico ico-net">◠</span>网络</div>
+        <div class="p-body">…</div>
+      </div>
+      <div class="panel hit clickable" id="p-chat">
+        <div class="p-title"><span class="p-ico ico-chat">❤</span>聊天</div>
+        <div class="p-body">AI 助理需先配置模型
+点我进聊天室 ▸</div>
+      </div>
+    </div>
+
+    <!-- 聊天室（粉色复古风） -->
+    <div id="chatbox" class="hit hidden">
+      <div id="chat-head">
+        <span class="ch-left"><span class="ch-ico">☻</span><span class="ch-title">聊 天 室</span></span>
+        <span class="ch-actions">
+          <button id="btn-settings" title="配置模型">⚙</button>
+          <button id="btn-chat-close" title="关闭">✕</button>
+        </span>
+      </div>
+      <div id="settings-row" class="hidden">
+        <div class="model-help">
+          <b>聊天和电脑助理能力需要你自己的模型配置。</b>
+          <span>请填写 API 地址、模型名和 API Key；桌宠动画、问候、饭点/休息提醒、角色上传、系统信息面板无需配置模型。</span>
+        </div>
+        <select id="provider-select" title="选择服务模板">
+          <option value="">选择服务模板</option>
+          <option value="deepseek">DeepSeek 官方</option>
+          <option value="openrouter">OpenRouter</option>
+          <option value="openai">OpenAI</option>
+          <option value="custom">自定义兼容接口</option>
+        </select>
+        <input id="api-url-input" type="text" placeholder="API 地址，如 https://api.deepseek.com/chat/completions" />
+        <input id="model-input" type="text" placeholder="模型名，由用户自己填写" />
+        <input id="key-input" type="password" placeholder="用户自己的 API Key，只保存在本机" />
+        <div class="settings-actions">
+          <button id="btn-save-key">保存配置</button>
+          <button id="btn-cancel-settings">收起</button>
+        </div>
+      </div>
+      <div id="chat-msgs"></div>
+      <div id="chat-input-row">
+        <span id="avatar-box"><canvas id="mini-cv" width="48" height="48"></canvas></span>
+        <input id="chat-input" type="text" placeholder="和小搭说点什么…" />
+        <button id="btn-send">▶</button>
+      </div>
+    </div>
+
+    <!-- 头顶气泡 -->
+    <div id="bubble" class="hidden"></div>
+    <!-- 睡觉 Zzz -->
+    <div id="zzz" class="hidden">Z z .</div>
+
+    <!-- 像素小人（居中，面板环绕）：petmotion 层承载呼吸/蹦跳等补间动画 -->
+    <div id="pet" class="hit">
+      <div id="zoom-ctrl">
+        <button id="zoom-in" title="放大">＋</button>
+        <button id="zoom-out" title="缩小">－</button>
+      </div>
+      <div id="petmotion"><canvas id="cv"></canvas></div>
+    </div>
+
+    <!-- 右键菜单 -->
+    <div id="ctxmenu" class="hit hidden">
+      <div class="mi" id="mi-switch">更换角色</div>
+      <div class="mi" id="mi-quit">退出小搭</div>
+    </div>
+
+  </div>
+
+  <script src="pets.js"></script>
+  <script src="sprites.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

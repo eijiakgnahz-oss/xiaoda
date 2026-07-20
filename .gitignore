@@ -1,0 +1,16 @@
+node_modules/
+*.log
+.DS_Store
+
+# 本地私密/内部文档，不上传到公开仓库
+PRD.md
+立项报告.md
+模型评测报告.md
+形象库/
+
+# Electron/用户本地数据
+dist/
+release/
+*.dmg
+*.zip
+xiaoda-config.json

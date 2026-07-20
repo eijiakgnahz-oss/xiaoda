@@ -1,0 +1,12 @@
+{
+  "name": "xiaoda",
+  "version": "0.1.0",
+  "description": "桌宠产品-小搭：像素风桌面小人",
+  "main": "main.js",
+  "scripts": {
+    "start": "env -u ELECTRON_RUN_AS_NODE electron ."
+  },
+  "devDependencies": {
+    "electron": "^31.7.7"
+  }
+}

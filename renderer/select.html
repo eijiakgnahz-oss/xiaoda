@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>选择你的小搭</title>
+  <link rel="stylesheet" href="select.css" />
+</head>
+<body>
+  <div id="box">
+    <div id="head">
+      <span>◈ 选择你的小搭</span>
+      <button id="btn-close" title="关闭">✕</button>
+    </div>
+
+    <div id="grid"></div>
+
+    <div id="foot">
+      <span id="hint">点选一个角色，或点 ＋ 上传图片生成专属小人</span>
+      <button id="btn-ok" disabled>确 定</button>
+    </div>
+  </div>
+
+  <!-- 上传生成预览弹层 -->
+  <div id="gen-mask" class="hidden">
+    <div id="gen-box">
+      <div class="gen-title">生成预览（本地像素化，不联网）</div>
+      <canvas id="gen-cv" width="160" height="160"></canvas>
+      <input id="gen-name" type="text" maxlength="8" placeholder="给它起个名字（最多8字）" />
+      <div class="gen-btns">
+        <button id="gen-ok">确认生成</button>
+        <button id="gen-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <input id="file-input" type="file" accept="image/*" class="hidden" />
+
+  <script src="pets.js"></script>
+  <script src="sprites.js"></script>
+  <script src="select.js"></script>
+</body>
+</html>
