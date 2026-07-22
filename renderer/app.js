@@ -330,8 +330,9 @@ function checkReminders(now) {
 // ---------------- ⑦ 鼠标穿透管理 ----------------
 // 窗口默认对鼠标"隐形"；指到小人/面板上时才接管鼠标
 let ignored = true;
+let chatDragging = false;
 window.addEventListener('mousemove', (e) => {
-  if (dragging) return;
+  if (dragging || chatDragging) return;
   const el = document.elementFromPoint(e.clientX, e.clientY);
   const hit = !!(el && el.closest('.hit'));
   if (hit === ignored) {
@@ -349,6 +350,7 @@ pet.addEventListener('mousedown', (e) => {
   lastX = e.screenX; lastY = e.screenY;
 });
 window.addEventListener('mousemove', (e) => {
+  if (chatDragging) return;
   if (!dragging) return;
   const dx = e.screenX - lastX, dy = e.screenY - lastY;
   lastX = e.screenX; lastY = e.screenY;
@@ -370,7 +372,7 @@ let walkX = 0, walkTarget = 0;
 function applyPetTransform() { pet.style.transform = `translateX(${walkX}px)`; }
 setInterval(() => {
   const chatOpen = !$('chatbox').classList.contains('hidden');
-  if (dragging) return;
+  if (dragging || chatDragging) return;
   if (state !== 'walk' || panelsOpen || chatOpen) {
     if (walkX !== 0) { // 非散步状态：缓缓走回中心
       walkX *= 0.85;
@@ -462,6 +464,17 @@ function togglePanels() {
 
 // ---------------- ⑤ 聊天窗 ----------------
 const chatHistory = []; // [{role, content}]
+const chatbox = $('chatbox');
+const chatHead = $('chat-head');
+
+function scrollChatToBottom() {
+  const msgs = $('chat-msgs');
+  requestAnimationFrame(() => {
+    msgs.scrollTop = msgs.scrollHeight;
+    requestAnimationFrame(() => { msgs.scrollTop = msgs.scrollHeight; });
+  });
+}
+
 function addMsg(kind, text) {
   const wrap = document.createElement('div');
   wrap.className = 'msg ' + kind;
@@ -476,22 +489,75 @@ function addMsg(kind, text) {
   t.textContent = text;
   wrap.appendChild(t);
   $('chat-msgs').appendChild(wrap);
-  $('chat-msgs').scrollTop = $('chat-msgs').scrollHeight;
+  scrollChatToBottom();
   return t;
+}
+function clampChatPosition(left, top) {
+  const stage = $('stage');
+  const maxLeft = Math.max(0, stage.clientWidth - chatbox.offsetWidth);
+  const maxTop = Math.max(0, stage.clientHeight - chatbox.offsetHeight);
+  return {
+    left: Math.min(maxLeft, Math.max(0, left)),
+    top: Math.min(maxTop, Math.max(0, top)),
+  };
+}
+function setChatPosition(left, top, save = true) {
+  const p = clampChatPosition(left, top);
+  chatbox.style.left = p.left + 'px';
+  chatbox.style.top = p.top + 'px';
+  if (save) localStorage.setItem('chat-pos', JSON.stringify(p));
+}
+function restoreChatPosition() {
+  try {
+    const p = JSON.parse(localStorage.getItem('chat-pos') || 'null');
+    if (p && Number.isFinite(p.left) && Number.isFinite(p.top)) setChatPosition(p.left, p.top, false);
+  } catch { /* 忽略损坏的本地位置 */ }
 }
 function openChat() {
   panelsOpen = false;
   $('panels').classList.add('hidden');
   clearInterval(statsTimer);
-  $('chatbox').classList.remove('hidden');
+  chatbox.classList.remove('hidden');
+  restoreChatPosition();
   $('chat-input').focus();
   if (!$('chat-msgs').children.length) {
     addMsg('pet', `你好呀，我是${charName}！桌宠动画、问候提醒和系统信息不用模型配置；聊天、联网搜索、打开应用/网页、文件操作、记忆、对话设提醒和今日情报，需要先点右上角 ⚙ 填入你自己的 API 地址、模型名和 API Key。`);
   }
+  scrollChatToBottom();
 }
-function closeChat() { $('chatbox').classList.add('hidden'); }
+function closeChat() { chatbox.classList.add('hidden'); }
 $('p-chat').addEventListener('click', openChat);
 $('btn-chat-close').addEventListener('click', closeChat);
+
+let chatDragStart = null;
+chatHead.addEventListener('mousedown', (e) => {
+  if (e.button !== 0 || e.target.closest('button')) return;
+  e.preventDefault();
+  chatDragging = true;
+  chatDragStart = {
+    x: e.clientX,
+    y: e.clientY,
+    left: chatbox.offsetLeft,
+    top: chatbox.offsetTop,
+  };
+  chatbox.classList.add('dragging');
+  window.xiaoda.setIgnoreMouse(false);
+});
+window.addEventListener('mousemove', (e) => {
+  if (!chatDragging || !chatDragStart) return;
+  setChatPosition(
+    chatDragStart.left + e.clientX - chatDragStart.x,
+    chatDragStart.top + e.clientY - chatDragStart.y,
+    false,
+  );
+});
+window.addEventListener('mouseup', () => {
+  if (!chatDragging) return;
+  chatDragging = false;
+  chatDragStart = null;
+  chatbox.classList.remove('dragging');
+  setChatPosition(chatbox.offsetLeft, chatbox.offsetTop, true);
+});
 
 const PROVIDER_PRESETS = {
   deepseek: { apiUrl: 'https://api.deepseek.com/chat/completions' },

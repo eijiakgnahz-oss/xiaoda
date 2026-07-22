@@ -220,7 +220,9 @@ body {
   border-radius: 7px;
   padding: 6px 8px;
   margin-bottom: 7px;
+  cursor: grab;
 }
+#chatbox.dragging #chat-head { cursor: grabbing; }
 .ch-left { display: flex; align-items: center; gap: 8px; }
 .ch-ico {
   width: 22px; height: 22px;
@@ -321,7 +323,7 @@ body {
   margin-bottom: 2px;
 }
 .msg .txt {
-  max-width: 85%;
+  max-width: 100%;
   min-width: 0;
   padding: 6px 9px;
   border-radius: 6px;
@@ -331,7 +333,7 @@ body {
   color: #2b2b3a;
 }
 .msg.user { align-items: flex-end; }
-.msg.user .txt { background: #ffedc2; border: 2px solid #2b2b3a; }
+.msg.user .txt { max-width: 88%; background: #ffedc2; border: 2px solid #2b2b3a; }
 .msg.pet { align-items: flex-start; }
 .msg.pet .txt { background: #fff; border: 2px solid #2b2b3a; }
 .msg.sys { align-items: center; }
