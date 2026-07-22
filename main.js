@@ -166,6 +166,44 @@ ipcMain.handle('save-config', (e, cfg) => {
   return { ok: true };
 });
 
+ipcMain.handle('test-model-config', async (e, draft) => {
+  const saved = loadConfig();
+  const apiUrl = String((draft && draft.apiUrl) || saved.apiUrl || '').trim();
+  const model = String((draft && draft.model) || saved.model || '').trim();
+  const apiKey = String((draft && draft.apiKey) || saved.apiKey || '').trim();
+  if (!apiUrl || !model || !apiKey) return { ok: false, error: '请先填写 API 地址、模型名和 API Key' };
+  if (!/^https?:\/\/\S+$/i.test(apiUrl)) return { ok: false, error: 'API 地址需要以 http:// 或 https:// 开头' };
+
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 15000);
+  try {
+    const r = await fetch(apiUrl, {
+      method: 'POST',
+      signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: 'user', content: 'ping' }],
+        temperature: 0,
+        max_tokens: 8,
+      }),
+    });
+    if (!r.ok) {
+      const t = await r.text();
+      if (r.status === 401) return { ok: false, error: 'API Key 无效或没有权限' };
+      return { ok: false, error: `连接失败（${r.status}）：${t.slice(0, 120)}` };
+    }
+    const data = await r.json();
+    const msg = data.choices && data.choices[0] && data.choices[0].message;
+    if (!msg) return { ok: false, error: '接口可访问，但返回格式不像 OpenAI Chat Completions' };
+    return { ok: true, model };
+  } catch (err) {
+    return { ok: false, error: err.name === 'AbortError' ? '连接超时，请检查网络或 API 地址' : '连接失败：' + err.message };
+  } finally {
+    clearTimeout(timer);
+  }
+});
+
 // ---------- 窗口交互 ----------
 ipcMain.on('set-ignore-mouse', (e, flag) => {
   if (petWin) petWin.setIgnoreMouseEvents(flag, { forward: true });

@@ -523,11 +523,33 @@ $('btn-settings').addEventListener('click', async () => {
 });
 $('btn-cancel-settings').addEventListener('click', () => showModelSettings(false));
 
+function currentModelDraft() {
+  return {
+    apiUrl: $('api-url-input').value.trim(),
+    model: $('model-input').value.trim(),
+    apiKey: $('key-input').value.trim(),
+  };
+}
+
+$('btn-test-model').addEventListener('click', async () => {
+  const draft = currentModelDraft();
+  if (!draft.apiUrl || !draft.model) {
+    addMsg('sys', '请先填写 API 地址和模型名');
+    return;
+  }
+  const btn = $('btn-test-model');
+  btn.disabled = true;
+  const oldText = btn.textContent;
+  btn.textContent = '测试中';
+  const res = await window.xiaoda.testModelConfig(draft);
+  btn.disabled = false;
+  btn.textContent = oldText;
+  addMsg('sys', res.ok ? `✓ 连接成功：${res.model}` : `⚠ ${res.error}`);
+});
+
 // 设置用户自己的 OpenAI 兼容模型配置
 $('btn-save-key').addEventListener('click', async () => {
-  const apiUrl = $('api-url-input').value.trim();
-  const model = $('model-input').value.trim();
-  const apiKey = $('key-input').value.trim();
+  const { apiUrl, model, apiKey } = currentModelDraft();
   if (!apiUrl || !model) {
     addMsg('sys', '请先填写 API 地址和模型名');
     return;

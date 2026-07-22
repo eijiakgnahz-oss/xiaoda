@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('xiaoda', {
   chat: (history) => ipcRenderer.invoke('chat', history),
   getConfig: () => ipcRenderer.invoke('get-config'),
   saveConfig: (cfg) => ipcRenderer.invoke('save-config', cfg),
+  testModelConfig: (cfg) => ipcRenderer.invoke('test-model-config', cfg),
   quit: () => ipcRenderer.send('quit'),
   getReminders: () => ipcRenderer.invoke('get-reminders'),
   removeReminder: (id) => ipcRenderer.invoke('remove-reminder', id),
