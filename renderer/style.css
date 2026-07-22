@@ -209,6 +209,7 @@ body {
   box-shadow: 0 5px 0 #2b2b3a, 0 9px 0 rgba(43, 43, 58, 0.25);
   padding: 7px;
   z-index: 6;
+  overflow: hidden;
 }
 #chat-head {
   display: flex;
@@ -298,7 +299,10 @@ body {
 #btn-cancel-settings { background: #fff8e7 !important; color: #2b2b3a !important; }
 #chat-msgs {
   flex: 1;
+  min-height: 0;
+  min-width: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   background: #fffdf6;
   border: 2px solid #2b2b3a;
   border-radius: 7px;
@@ -306,9 +310,9 @@ body {
   font-size: 12.5px;
   line-height: 1.65;
 }
-#chat-msgs::-webkit-scrollbar { width: 8px; }
+#chat-msgs::-webkit-scrollbar { width: 8px; height: 8px; }
 #chat-msgs::-webkit-scrollbar-thumb { background: #e5d9b8; border-radius: 4px; }
-.msg { margin-bottom: 10px; display: flex; flex-direction: column; }
+.msg { margin-bottom: 10px; display: flex; flex-direction: column; min-width: 0; }
 .msg .name {
   font-size: 11px;
   font-weight: 800;
@@ -318,10 +322,12 @@ body {
 }
 .msg .txt {
   max-width: 85%;
+  min-width: 0;
   padding: 6px 9px;
   border-radius: 6px;
   white-space: pre-wrap;
-  word-break: break-all;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   color: #2b2b3a;
 }
 .msg.user { align-items: flex-end; }
